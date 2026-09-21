@@ -217,7 +217,7 @@ function guideLine(q) {
 }
 // 回報這題：開 GitHub issue form,自動帶入題號與科目
 function reportLink(q) {
-  const url = `https://github.com/yazelin/ipas-ai-quiz/issues/new?template=question-report.yml`
+  const url = `https://github.com/yazelin/quiz-deploy-test/issues/new?template=question-report.yml`
     + `&qid=${encodeURIComponent(q.id)}&subject=${encodeURIComponent(q.subject)}`;
   return `<p class="report-line"><a href="${url}" target="_blank" rel="noopener">這題有誤？回報給作者</a></p>`;
 }
