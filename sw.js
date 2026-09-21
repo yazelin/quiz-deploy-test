@@ -24,7 +24,7 @@ self.addEventListener('activate', (e) => {
 });
 // 推播:顯示通知
 self.addEventListener('push', (e) => {
-  let d = { title: 'iPAS 模考', body: '來刷幾題吧!', url: '/' };
+  let d = { title: '駕照筆試（示範）', body: '來刷幾題吧!', url: '/' };
   try { d = { ...d, ...e.data.json() }; } catch {}
   e.waitUntil(self.registration.showNotification(d.title, { body: d.body, icon: 'icon-192.png', badge: 'icon-192.png', data: { url: d.url } }));
 });
