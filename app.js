@@ -1,6 +1,6 @@
 import { nextBox, isMastered, scoreExam, progressStats, wrongQuestionIds, toMarkdown, reviewPriority, guessLevel, nextExam, MASTER_BOX } from './core.js';
 
-const STORE_KEY = 'ipas_quiz_progress';
+const STORE_KEY = 'demoquiz_progress';   // 必須跟原站不同:同一個 github.io 帳號下所有站共用一個 origin,沿用會互相覆蓋進度
 // 部署 Cloudflare Worker 後填入，例如 'https://ipas-quiz-sync.你的帳號.workers.dev'。留空=只用本機。
 const SYNC_URL = 'https://quiz-demo-sync.yazelinj303.workers.dev';
 const VAPID_PUBLIC = 'BO4KPqw_I95P9uvL_9dBNAibazH_pZYM5eBsgS-LqAaJ6NQeorHoc4CWj8cC1vrdE7mVGc5IpQWJb_16Ckgbmuc';
@@ -18,8 +18,8 @@ let dirty = false; // 有未上傳的本機變動才寫 KV(localStorage 才是�
 // 用單機旗標記住「已關掉/已安裝」就別再顯示（install 狀態每台不同，故不進同步 store）
 let deferredInstall = null;
 const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-const installBarOff = () => localStorage.getItem('ipas_installbar_off') === '1';
-const dismissInstallBar = () => { localStorage.setItem('ipas_installbar_off', '1'); const b = document.getElementById('installbar'); if (b) b.hidden = true; deferredInstall = null; };
+const installBarOff = () => localStorage.getItem('demoquiz_installbar_off') === '1';
+const dismissInstallBar = () => { localStorage.setItem('demoquiz_installbar_off', '1'); const b = document.getElementById('installbar'); if (b) b.hidden = true; deferredInstall = null; };
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredInstall = e;
@@ -611,7 +611,7 @@ function notes() {
     </section>`;
   view.querySelectorAll('.note-edit').forEach((t) => (t.oninput = (e) => { qp(e.target.dataset.id).note = e.target.value; save(); }));
   view.querySelectorAll('.goto').forEach((b) => (b.onclick = () => { const q = DATA.questions.find((x) => x.id === b.dataset.id); if (q) runPractice([q]); }));
-  if (items.length) $('#exp-notes').onclick = () => download('ipas-notes.md', toMarkdown(DATA.questions, store.q), 'text/markdown');
+  if (items.length) $('#exp-notes').onclick = () => download('demoquiz-notes.md', toMarkdown(DATA.questions, store.q), 'text/markdown');
 }
 
 function stats() {
@@ -689,7 +689,7 @@ function examInfoHtml() {
   return `<div class="guide" style="white-space:normal">
     ${EXAMINFO.pass ? `<p style="margin:0 0 6px">${esc(EXAMINFO.pass)}</p>` : ''}
     ${picks ? `<div style="margin-bottom:6px">一鍵設為倒數日期(初級/中級日期不同,自己選):<br>${picks}</div>` : ''}
-    <a href="https://ipd.nat.gov.tw/ipas/certification/AIAP/exam-info" target="_blank" rel="noopener">官方考試資訊 ↗</a>
+    <a href="https://www.thb.gov.tw/cl.aspx?n=12" target="_blank" rel="noopener">官方筆試題庫 ↗</a>
   </div>`;
 }
 
@@ -816,8 +816,8 @@ function settings() {
     $('#sync-msg').textContent = pushed || pulled ? '已同步' : '同步失敗（檢查網路或同步碼）';
     if (pulled) setTimeout(settings, 600);
   };
-  $('#exp').onclick = () => download('ipas-progress.json', JSON.stringify(store, null, 2), 'application/json');
-  $('#exp-md').onclick = () => download('ipas-notes.md', toMarkdown(DATA.questions, store.q), 'text/markdown');
+  $('#exp').onclick = () => download('demoquiz-progress.json', JSON.stringify(store, null, 2), 'application/json');
+  $('#exp-md').onclick = () => download('demoquiz-notes.md', toMarkdown(DATA.questions, store.q), 'text/markdown');
   $('#imp-btn').onclick = () => $('#imp').click();
   $('#imp').onchange = async (e) => {
     const f = e.target.files[0];
