@@ -35,6 +35,19 @@
 
 ### 第一段：讓站活著
 
+**貼給 AI 的那段話：**
+
+```
+請 clone https://github.com/yazelin/ipas-ai-quiz 到這個資料夾，並讀它的 AGENTS.md。
+
+跑 node tools/rebrand.mjs --name 「◯◯◯」 --repo 我的帳號/我的repo 換裝，
+把 questions.json 依它的 schema 換成我的題庫（來源與格式先問我），
+跑 node tools/check-questions.mjs 與 node core.test.mjs 都要過，
+再用 gh 建 repo、推上去、開 Pages，把網址給我。
+```
+
+它實際會跑的東西在下面，出問題時對照用。
+
 **換裝現在有工具了，不用手動改十七個地方：**
 
 ```bash
@@ -54,7 +67,30 @@ gh api -X POST repos/<你的帳號>/<你的repo>/pages -f 'source[branch]=main' 
 
 ### 第二段：跨裝置同步與推播（選做）
 
-指令總共跑不到 20 秒：
+**貼給 AI 的那段話：**
+
+```
+現在幫我加上跨裝置同步與推播，照 AGENTS.md 的「自架同步/推播後端」做。
+
+一、進 worker/ 跑 npm i，用 wrangler 建一個 D1 資料庫（名字我等一下給你），
+把它回傳的 database_id 填進 worker/wrangler.toml，
+同時把 wrangler.toml 的 name 改成一個沒被別人用過的名字。
+注意：binding 要維持 DB，不要照 wrangler 印出來的建議改成資料庫名，程式用的是 env.DB。
+
+二、灌 worker/schema.sql 建表，然後 npx wrangler deploy（要先部署，secret 才放得進去）。
+
+三、跑 npx web-push generate-vapid-keys --json 產一對金鑰：
+公鑰填進 worker/wrangler.toml 的 [vars] VAPID_PUBLIC，以及 app.js 最上面的 VAPID_PUBLIC，兩個地方都要；
+私鑰用 npx wrangler secret put VAPID_PRIVATE 存進去，不要寫進任何檔案、不要 commit。
+
+四、把 Worker 網址填回 app.js 的 SYNC_URL，把 sw.js 的 CACHE 版號加一，推上去。
+
+最後用 curl 驗四個端點給我看：沒寫過的碼要回 404、PUT 要 200、GET 要讀得回剛才那包、亂碼要回 400。
+```
+
+**金鑰是這一段最容易卡住的地方，所以咒語裡把去向寫死了：公鑰要填 `wrangler.toml` 與 `app.js` 兩個地方，私鑰只能進 `wrangler secret`。**
+
+它實際會跑的指令，總共不到 20 秒：
 
 ```bash
 cd worker && npm i                                     # 1 秒
@@ -105,6 +141,7 @@ curl -s -o /dev/null -w "%{http_code}\n" $U/sync/not_a_valid_code      # 400
 
 ## 更新紀錄
 
+- **2026-09-22（晚上）**：兩段都補上可以直接複製的咒語，第二段把 VAPID 公私鑰的去向寫死在裡面。原本只有指令清單、沒有咒語，金鑰產出來之後要放哪也完全沒交代。
 - **2026-09-22（下午）**：題庫換成**真的官方題庫**——公路局 115.5.29 公告版，880 題。原本那 20 題 AI 自撰示範題退場。同步支援三選一（上游 PR #48）與 `rebrand.mjs` 換裝工具（上游 PR #47）。
 - **2026-09-22（上午）**：修掉同 origin 的 `localStorage` 撞 key（會讀到也會污染原站進度）；修掉示範題庫 18/20 正解都是 (B) 的問題；同步上游的手機分頁換行修正。
 - **2026-09-21**：建立。第一段與第二段都實測走完。
